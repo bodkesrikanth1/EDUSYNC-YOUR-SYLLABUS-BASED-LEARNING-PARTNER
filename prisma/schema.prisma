@@ -1,0 +1,81 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  STUDENT
+  FACULTY
+  ADMIN
+}
+
+model User {
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  fullName      String
+  email         String    @unique
+  passwordHash  String
+  role          Role      @default(STUDENT)
+  college       String?
+  department    String?
+  year          String?
+  enrollmentNo  String?
+  phone         String?
+  createdAt     DateTime  @default(now())
+  syllabi       Syllabus[]
+}
+
+model Syllabus {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  text      String
+  createdAt DateTime @default(now())
+  units     Unit[]
+}
+
+model Unit {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  syllabusId  String   @db.ObjectId
+  syllabus    Syllabus @relation(fields: [syllabusId], references: [id], onDelete: Cascade)
+  unitNo      Int
+  unitTitle   String?
+  topics      Topic[]
+}
+
+model Topic {
+  id      String   @id @default(auto()) @map("_id") @db.ObjectId
+  unitId  String   @db.ObjectId
+  unit    Unit     @relation(fields: [unitId], references: [id], onDelete: Cascade)
+  text    String
+  weight  Float    @default(0)
+  summary String?
+  notes   String?
+  videos  Video[]
+}
+
+model Video {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  topicId       String   @db.ObjectId
+  topic         Topic    @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  youtubeId     String
+  title         String
+  channelTitle  String
+  channelId     String
+  durationSec   Int
+  viewCount     Int
+  publishedAt   DateTime
+  ratingScore   Float
+  similarity    Float
+  finalScore    Float
+  difficulty    String   // beginner/intermediate/advanced
+  url           String
+  thumbnailUrl  String?
+}
