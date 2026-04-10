@@ -55,7 +55,7 @@ export default async function ResultsPage(props: {
     // Calculate metadata
     const stats = {
         units: syllabus.units.length,
-        topics: syllabus.units.reduce((acc, unit) => acc + (unit.topics?.length || 0), 0)
+        topics: syllabus.units.reduce<number>((acc, unit) => acc + (unit.topics?.length || 0), 0)
     };
 
     return (
